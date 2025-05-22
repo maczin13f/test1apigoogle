@@ -30,6 +30,17 @@ passport.use(new GoogleStrategy({
       foto: profile.photos[0].value
     };
 
+    async function salvarUsuarioNoBanco(userData) {
+      const existente = await Usuario.findOne({ google_id: userData.google_id });
+    
+      if (!existente) {
+        await Usuario.create(userData);
+        console.log("Usuário salvo no MongoDB.");
+      } else {
+        console.log("Usuário já existe no banco.");
+      }
+    }  
+
     // Aqui você salva no banco de dados
     await salvarUsuarioNoBanco(userData);
 
@@ -55,17 +66,6 @@ app.get("/dashboard", (req, res) => {
   if (!req.isAuthenticated()) return res.redirect("/");
   res.json(req.user); // ou renderiza uma página
 });
-
-  async function salvarUsuarioNoBanco(userData) {
-    const existente = await Usuario.findOne({ google_id: userData.google_id });
-  
-    if (!existente) {
-      await Usuario.create(userData);
-      console.log("Usuário salvo no MongoDB.");
-    } else {
-      console.log("Usuário já existe no banco.");
-    }
-  }
 
 conectarMongoDB();
 
