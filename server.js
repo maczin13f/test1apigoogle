@@ -48,11 +48,17 @@ app.get("/auth/google", passport.authenticate("google", {
 }));
 
 app.get("/auth/google/callback",
+  (req, res, next) => {
+    console.log("🔁 Chegou na rota de callback do Google");
+    next();
+  },
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-   res.redirect("/api.html");
+    console.log("✅ Usuário autenticado com sucesso, redirecionando para api.html");
+    res.redirect("/api.html");
   }
 );
+
 
 // Exemplo: dashboard com dados do usuário
 app.get("/dashboard", (req, res) => {
