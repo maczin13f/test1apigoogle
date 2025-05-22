@@ -77,7 +77,7 @@ async function salvarUsuarioNoBanco(userData) {
   }
 }
 
+conectarMongoDB().then(() => {
+  app.listen(3000, () => console.log("Servidor rodando em http://localhost:3000"));
+});
 
-conectarMongoDB();
-
-app.listen(3000, () => console.log("Servidor rodando em http://localhost:3000"));
