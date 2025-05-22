@@ -16,36 +16,29 @@ app.use(express.static("public"));
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
-// Configura estratégia Google
 passport.use(new GoogleStrategy({
-    clientID: "746977735603-r9m3nv7sedf1qt5etubge1o8nrbmosng.apps.googleusercontent.com",
-    clientSecret: "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",
-    callbackURL: "https://testeapigoogle.onrender.com/auth/google/callback"
-  },
-  async (accessToken, refreshToken, profile, done) => {
+  clientID: "746977735603-r9m3nv7sedf1qt5etubge1o8nrbmosng.apps.googleusercontent.com",
+  clientSecret: "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",
+  callbackURL: "https://testeapigoogle.onrender.com/auth/google/callback"
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    console.log("✅ Dados do Google:", profile); // Log do profile completo
+
     const userData = {
       google_id: profile.id,
       nome: profile.displayName,
-      email: profile.emails[0].value,
-      foto: profile.photos[0].value
+      email: profile.emails?.[0]?.value || "sem email",
+      foto: profile.photos?.[0]?.value || "sem foto"
     };
 
-    async function salvarUsuarioNoBanco(userData) {
-      const existente = await Usuario.findOne({ google_id: userData.google_id });
-    
-      if (!existente) {
-        await Usuario.create(userData);
-        console.log("Usuário salvo no MongoDB.");
-      } else {
-        console.log("Usuário já existe no banco.");
-      }
-    }  
-
-    // Aqui você salva no banco de dados
     await salvarUsuarioNoBanco(userData);
-
     return done(null, userData);
+  } catch (err) {
+    console.error("❌ Erro durante o processamento do login:", err);
+    return done(err);
   }
+}
 ));
 
 // Rotas
@@ -66,6 +59,24 @@ app.get("/dashboard", (req, res) => {
   if (!req.isAuthenticated()) return res.redirect("/");
   res.json(req.user); // ou renderiza uma página
 });
+
+async function salvarUsuarioNoBanco(userData) {
+  try {
+    console.log("📦 Salvando no Mongo:", userData);
+
+    const existente = await Usuario.findOne({ google_id: userData.google_id });
+
+    if (!existente) {
+      await Usuario.create(userData);
+      console.log("✅ Usuário salvo no MongoDB.");
+    } else {
+      console.log("ℹ️ Usuário já existe.");
+    }
+  } catch (err) {
+    console.error("❌ Erro ao salvar no MongoDB:", err);
+  }
+}
+
 
 conectarMongoDB();
 
