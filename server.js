@@ -19,7 +19,7 @@ passport.deserializeUser((user, done) => done(null, user));
 passport.use(new GoogleStrategy({
   clientID: "746977735603-r9m3nv7sedf1qt5etubge1o8nrbmosng.apps.googleusercontent.com",
   clientSecret: "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",
-  callbackURL: "https://testeapigoogle.onrender.com/auth/google/callback"
+  callbackURL: "https://test1apigoogle.onrender.com/auth/google/callback"
 },
 async (accessToken, refreshToken, profile, done) => {
   try {
